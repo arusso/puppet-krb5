@@ -3,6 +3,6 @@
 # Installs the necessary packages for k5start
 #
 class krb5::k5start::install {
-  $packages = 'k5start'
+  $packages = [ 'kstart', 'runcon' ]
   package { $packages: ensure => installed }
 }
