@@ -5,6 +5,8 @@ define krb5::k5start::initscript (
   $options = undef,
   $keytab = undef
 ) {
+  include krb5::k5start
+
   $owner_r = $owner
   $owner_uid_r = $owner_uid
   $minutes_r = $minutes
