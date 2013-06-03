@@ -1,3 +1,6 @@
+2013-05-02 Aaron Russo <arusso@berkeley.edu> - 0.0.4
+* updating module source links in response to github acct rename
+
 2013-05-22 Aaron Russo <arusso@berkeley.edu> - 0.0.3
 * runcon is part of coreutils, and should not be installed via krb5
 
