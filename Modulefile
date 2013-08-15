@@ -1,5 +1,5 @@
 name 'arusso-krb5'
-version '0.0.4'
+version '0.0.5'
 summary "krb5 client management"
 description "krb5 management module supporting client configuration, kstart
   and multiple keytabs"

@@ -1,3 +1,6 @@
+2013-08-15 Aaron Russo <arusso@berkeley.edu> - 0.0.5
+* issue #1 - unable to create multiple k5start init scripts
+
 2013-05-02 Aaron Russo <arusso@berkeley.edu> - 0.0.4
 * updating module source links in response to github acct rename
 
