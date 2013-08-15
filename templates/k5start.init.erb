@@ -8,7 +8,7 @@
 #
 # processname: /usr/bin/k5start
 # config: /etc/krb5.conf
-# pidfile: /var/run/k5start.pid
+# pidfile: /var/run/k5start-<%= @title %>.pid
 
 # Sanity checks.
 [ -f /etc/krb5.conf ] || exit 0
@@ -32,22 +32,22 @@ RETVAL=0
 
 
 start() {
-    echo -n $"Starting k5start: "
-# 20121012, skg - This will fail without runcon. See redhat bug 785925.
+    echo -n $"Starting k5start-<%= @title %>: "
+    # 20121012, skg - This will fail without runcon. See redhat bug 785925.
     daemon runcon -t unconfined_t /usr/bin/k5start -k $KRB5CCNAME -f $K5START_KEYTAB -bLK $K5START_MINUTES \
                         -o $OWNER -g $OWNER \
-                        -p /var/run/k5start.pid $K5START_OPTIONS -U
+                        -p /var/run/k5start-<%= @title %>.pid $K5START_OPTIONS -U
     RETVAL=$?
     echo
-    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/k5start
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/k5start-<%= @title %>
     return $RETVAL
 }
 
 stop() {
-    echo -n $"Stopping k5start: "
-    killproc -p /var/run/k5start.pid k5start
+    echo -n $"Stopping k5start-<%= @title %>: "
+    killproc -p /var/run/k5start-<%= @title %>.pid k5start-<% @title %>
     RETVAL=$?
-    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/k5start
+    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/k5start-<%= @title %>
     echo
     return $RETVAL
 }
@@ -68,7 +68,7 @@ case "$1" in
         RETVAL=$?
         ;;
     status)
-        status -p /var/run/k5start.pid k5start
+        status -p /var/run/k5start-<%= @title %>.pid k5start-<%= @title %>
         RETVAL=$?
         ;;
     restart)
@@ -76,7 +76,7 @@ case "$1" in
         RETVAL=$?
         ;;
     try-restart | condrestart)
-        [ -e /var/lock/subsys/k5start ] && restart
+        [ -e /var/lock/subsys/k5start-<%= @title %> ] && restart
         RETVAL=$?
         ;;
     force-reload | reload)
