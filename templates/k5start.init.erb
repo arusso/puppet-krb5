@@ -22,9 +22,10 @@ K5START_KEYTAB=<%= @keytab_r %>
 K5START_MINUTES=<%= @minutes_r %>
 K5START_OPTIONS=<%= @options_r %>
 OWNER=<%= @owner_r %>
-GROUP=$(/usr/bin/id -ng $OWNER)
+GROUP=<% if @group_r -%><%= @group_r %><% else -%>$(/usr/bin/id -ng $OWNER)<% end %>
 USERUID=$(/usr/bin/id -u $OWNER)
 KRB5CCNAME=/tmp/krb5cc_${USERUID}
+FILEMODE=<%= @filemode_r %>
 
 # Source an auxiliary options file if we have one
 # This can override K5START_KEYTAB, K5START_MINUTES and K5START_OPTIONS
@@ -37,7 +38,7 @@ start() {
     echo -n $"Starting k5start-<%= @owner %>: "
     # 20121012, skg - This will fail without runcon. See redhat bug 785925.
     daemon <% if @use_selinux -%>runcon -t unconfined_t <% end -%>$prog -k $KRB5CCNAME -f $K5START_KEYTAB -bLK $K5START_MINUTES \
-                        -o $OWNER -g $GROUP \
+                        -o $OWNER -g $GROUP -m $FILEMODE \
                         -p /var/run/k5start-<%= @owner %>.pid $K5START_OPTIONS -U
     RETVAL=$?
     echo
