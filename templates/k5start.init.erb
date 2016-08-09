@@ -38,7 +38,7 @@ start() {
     echo -n $"Starting k5start-<%= @owner_r%>: "
     # 20121012, skg - This will fail without runcon. See redhat bug 785925.
     daemon <% if @use_selinux -%>runcon -t unconfined_t <% end -%>$prog -k $KRB5CCNAME -f $K5START_KEYTAB -bLK $K5START_MINUTES \
-                        -o $OWNER -g $GROUP -m $FILEMODE \
+                        <% if @tktlifetime_r -%>-l <%= @tktlifetime_r -%><% end %> -o $OWNER -g $GROUP -m $FILEMODE \
                         -p /var/run/k5start-<%= @owner_r%>.pid $K5START_OPTIONS -U
     RETVAL=$?
     echo
