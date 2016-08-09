@@ -8,11 +8,12 @@
 #
 # processname: /usr/bin/k5start
 # config: /etc/krb5.conf
-# pidfile: /var/run/k5start-<%= @title %>.pid
+# pidfile: /var/run/k5start-<%= @owner_r%>.pid
 
+prog="/usr/bin/k5start"
 # Sanity checks.
 [ -f /etc/krb5.conf ] || exit 0
-[ -x /usr/bin/k5start ] || exit 0
+[ -x $prog ] || exit 0
 
 # Source function library.
 . /etc/init.d/functions
@@ -21,7 +22,10 @@ K5START_KEYTAB=<%= @keytab_r %>
 K5START_MINUTES=<%= @minutes_r %>
 K5START_OPTIONS=<%= @options_r %>
 OWNER=<%= @owner_r %>
-KRB5CCNAME=/tmp/krb5cc_<%= @owner_uid_r %>
+GROUP=<% if @group_r -%><%= @group_r %><% else -%>$(/usr/bin/id -ng $OWNER)<% end %>
+USERUID=$(/usr/bin/id -u $OWNER)
+KRB5CCNAME=/tmp/krb5cc_${USERUID}
+FILEMODE=<%= @filemode_r %>
 
 # Source an auxiliary options file if we have one
 # This can override K5START_KEYTAB, K5START_MINUTES and K5START_OPTIONS
@@ -30,24 +34,23 @@ KRB5CCNAME=/tmp/krb5cc_<%= @owner_uid_r %>
 
 RETVAL=0
 
-
 start() {
-    echo -n $"Starting k5start-<%= @title %>: "
+    echo -n $"Starting k5start-<%= @owner_r%>: "
     # 20121012, skg - This will fail without runcon. See redhat bug 785925.
-    daemon runcon -t unconfined_t /usr/bin/k5start -k $KRB5CCNAME -f $K5START_KEYTAB -bLK $K5START_MINUTES \
-                        -o $OWNER -g $OWNER \
-                        -p /var/run/k5start-<%= @title %>.pid $K5START_OPTIONS -U
+    daemon <% if @use_selinux -%>runcon -t unconfined_t <% end -%>$prog -k $KRB5CCNAME -f $K5START_KEYTAB -bLK $K5START_MINUTES \
+                        <% if @tktlifetime_r -%>-l <%= @tktlifetime_r -%><% end %> -o $OWNER -g $GROUP -m $FILEMODE \
+                        -p /var/run/k5start-<%= @owner_r%>.pid $K5START_OPTIONS -U
     RETVAL=$?
     echo
-    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/k5start-<%= @title %>
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/k5start-<%= @owner_r%>
     return $RETVAL
 }
 
 stop() {
-    echo -n $"Stopping k5start-<%= @title %>: "
-    killproc -p /var/run/k5start-<%= @title %>.pid k5start-<% @title %>
+    echo -n $"Stopping k5start-<%= @owner_r%>: "
+    killproc -p /var/run/k5start-<%= @owner_r%>.pid k5start-<% @owner_r%>
     RETVAL=$?
-    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/k5start-<%= @title %>
+    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/k5start-<%= @owner_r%>
     echo
     return $RETVAL
 }
@@ -68,7 +71,7 @@ case "$1" in
         RETVAL=$?
         ;;
     status)
-        status -p /var/run/k5start-<%= @title %>.pid k5start-<%= @title %>
+        status -p /var/run/k5start-<%= @owner_r%>.pid k5start-<%= @owner_r%>
         RETVAL=$?
         ;;
     restart)
@@ -76,7 +79,7 @@ case "$1" in
         RETVAL=$?
         ;;
     try-restart | condrestart)
-        [ -e /var/lock/subsys/k5start-<%= @title %> ] && restart
+        [ -e /var/lock/subsys/k5start-<%= @owner_r%> ] && restart
         RETVAL=$?
         ;;
     force-reload | reload)

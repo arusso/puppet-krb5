@@ -1,18 +1,23 @@
 define krb5::k5start::initscript (
-  $owner = undef,
-  $owner_uid = undef,
-  $minutes = undef,
-  $options = undef,
-  $keytab = undef
+  $owner       = undef,
+  $group       = undef,
+  $minutes     = 60,
+  $options     = undef,
+  $keytab      = undef,
+  $use_selinux = true,
+  $filemode    = '600',
+  $tktlifetime = undef,
 ) {
   include krb5::k5start
 
-  $owner_r = $owner
-  $owner_uid_r = $owner_uid
-  $minutes_r = $minutes
-  $options_r = $options
-  $keytab_r = $keytab
-  $name_r = $name
+  $owner_r       = $owner
+  $group_r       = $group
+  $minutes_r     = $minutes
+  $options_r     = $options
+  $keytab_r      = $keytab
+  $name_r        = $owner
+  $filemode_r    = $filemode
+  $tktlifetime_r = $tktlifetime
 
   file { "/etc/init.d/k5start-${name_r}":
     ensure  => present,
