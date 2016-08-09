@@ -8,7 +8,7 @@
 #
 # processname: /usr/bin/k5start
 # config: /etc/krb5.conf
-# pidfile: /var/run/k5start-<%= @owner %>.pid
+# pidfile: /var/run/k5start-<%= @owner_r%>.pid
 
 prog="/usr/bin/k5start"
 # Sanity checks.
@@ -35,22 +35,22 @@ FILEMODE=<%= @filemode_r %>
 RETVAL=0
 
 start() {
-    echo -n $"Starting k5start-<%= @owner %>: "
+    echo -n $"Starting k5start-<%= @owner_r%>: "
     # 20121012, skg - This will fail without runcon. See redhat bug 785925.
     daemon <% if @use_selinux -%>runcon -t unconfined_t <% end -%>$prog -k $KRB5CCNAME -f $K5START_KEYTAB -bLK $K5START_MINUTES \
                         -o $OWNER -g $GROUP -m $FILEMODE \
-                        -p /var/run/k5start-<%= @owner %>.pid $K5START_OPTIONS -U
+                        -p /var/run/k5start-<%= @owner_r%>.pid $K5START_OPTIONS -U
     RETVAL=$?
     echo
-    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/k5start-<%= @owner %>
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/k5start-<%= @owner_r%>
     return $RETVAL
 }
 
 stop() {
-    echo -n $"Stopping k5start-<%= @owner %>: "
-    killproc -p /var/run/k5start-<%= @owner %>.pid k5start-<% @owner %>
+    echo -n $"Stopping k5start-<%= @owner_r%>: "
+    killproc -p /var/run/k5start-<%= @owner_r%>.pid k5start-<% @owner_r%>
     RETVAL=$?
-    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/k5start-<%= @owner %>
+    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/k5start-<%= @owner_r%>
     echo
     return $RETVAL
 }
@@ -71,7 +71,7 @@ case "$1" in
         RETVAL=$?
         ;;
     status)
-        status -p /var/run/k5start-<%= @owner %>.pid k5start-<%= @owner %>
+        status -p /var/run/k5start-<%= @owner_r%>.pid k5start-<%= @owner_r%>
         RETVAL=$?
         ;;
     restart)
@@ -79,7 +79,7 @@ case "$1" in
         RETVAL=$?
         ;;
     try-restart | condrestart)
-        [ -e /var/lock/subsys/k5start-<%= @owner %> ] && restart
+        [ -e /var/lock/subsys/k5start-<%= @owner_r%> ] && restart
         RETVAL=$?
         ;;
     force-reload | reload)
